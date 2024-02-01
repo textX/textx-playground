@@ -1,9 +1,14 @@
+import Header from "./components/Header";
+import Playground from "./pages/Playground";
+
 function App() {
+
   return (
-    <div className="flex flex-col justify-center items-center w-full h-full text-lg">
-      TextX Playground
+    <div className="flex flex-col h-full text-[#262626]">
+      <Header />
+      <Playground />
     </div>
   )
 }
 
-export default App
+export default App;
