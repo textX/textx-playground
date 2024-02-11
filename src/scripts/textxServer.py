@@ -16,16 +16,18 @@ def did_change(ls, params):
 
 @server.feature(TEXT_DOCUMENT_DID_OPEN)
 def did_open(ls, params):
-    validate(ls, params)
+    ls.show_message_log('Document open')
+    ls.show_message_log(repr(params))
+    validate(ls, params) 
 
 
 def validate(ls, params):
     ls.show_message_log('Validating program...')
-    text_doc = ls.workspace.get_document(params.text_document.uri)
+    text_doc = ls.workspace.get_text_document(params.text_document.uri)
     grammar_diagnostics = []
     model_diagnostics = []
 
-    docs = ls.workspace.documents
+    docs = ls.workspace.text_documents
     ls.show_message_log(str(len(docs)))
     
     if len(docs) < 2:

@@ -1,22 +1,43 @@
-import "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js";
+// @ts-ignore
+importScripts("https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js");
 
 const LOG_PREFIX = `[${self.name}]`;
 const log = (message: string) => console.log(LOG_PREFIX, message);
 
-const pyodideReady = initPyodide()
+let pyodideReady: any;
+
+type ScriptName = 'textxInstallation' | 'textxServer' | 'clientMessageHandler';
+
+const scripts = {
+  textxInstallation: '',
+  textxServer: '',
+  clientMessageHandler: '',
+};
 
 onmessage = async (event) => {
-  let pyodide = await pyodideReady
 
-  log('Message from language client');
+  if (event.data.type === 'start-textx-worker') {
+    log(event.data)
+
+    for (let key of Object.keys(scripts)) {
+      scripts[key as ScriptName] = await getFileContent(event.data.scriptUrls[key]);
+    }
+    pyodideReady = await initPyodide();
+    postMessage("textx-worker-started");
+    return;
+  }
+
+  log('Request from language client');
+
   log(event.data)
+
+  let pyodide = await pyodideReady;
 
   // variable name (client_message) must mach the one from the processClientMessage.py import
   /* @ts-ignore */
   self.client_message = JSON.stringify(event.data);
 
-  const processClientMessageScript = await getFileContent('./scripts/processClientMessage.py');
-  await pyodide.runPythonAsync(processClientMessageScript);
+  await pyodide.runPython(scripts.clientMessageHandler);
 }
 
 async function initPyodide() {
@@ -28,25 +49,21 @@ async function initPyodide() {
 
   log("Installing dependencies...");
 
-  const textxInstallationScript = await getFileContent('./scripts/textxInstallation.py');
   await pyodide.loadPackage(["micropip"])
-  await pyodide.runPythonAsync(textxInstallationScript)
+  await pyodide.runPythonAsync(scripts.textxInstallation);
 
   pyodide.globals.get('sys').stdout.write = patchedStdout;
 
   log("Starting TextX server...");
-  
-  const textxServerScript = await getFileContent('./scripts/textxServer.py');
-  await pyodide.runPythonAsync(textxServerScript);
+
+  await pyodide.runPythonAsync(scripts.textxServer);
 
   log("TextX server started...");
 
-  postMessage("textx-worker-started");
-
-  return pyodide
+  return pyodide;
 }
 
-async function getFileContent(url: string) {
+async function getFileContent(url: string): Promise<string> {
   try {
     const response = await fetch(url);
     if (!response.ok) {
@@ -66,7 +83,6 @@ function patchedStdout(data: any) {
 
   const message = JSON.parse(data);
 
-  log('Message from language server')
   log(message)
   postMessage(message)
 }
