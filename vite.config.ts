@@ -13,4 +13,5 @@ export default defineConfig({
   resolve: {
     dedupe: ['monaco-editor', 'vscode']
   },
+  base: '/textx-playground/'
 })
