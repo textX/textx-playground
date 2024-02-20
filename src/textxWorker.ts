@@ -27,8 +27,6 @@ onmessage = async (event) => {
     return;
   }
 
-  log('Request from language client');
-
   log(event.data)
 
   let pyodide = await pyodideReady;

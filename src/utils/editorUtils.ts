@@ -5,6 +5,9 @@ import { CloseAction, ErrorAction, MessageTransports } from "vscode-languageclie
 import { BrowserMessageReader, BrowserMessageWriter } from 'vscode-languageserver-protocol/browser.js';
 import { createConfiguredEditor } from 'vscode/monaco';
 
+export const GRAMMAR_FILE_URI = 'inmemory://model/1';
+export const MODEL_FILE_URI = 'inmemory://model/2';
+
 self.MonacoEnvironment = {
   getWorker: function () {
     return new editorWorker();

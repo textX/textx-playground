@@ -1,20 +1,26 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import LZString from 'lz-string';
 import Editor from "../components/Editor";
 import Spinner from "../components/Spinner";
 import { useEditorsContext } from "../utils/editorContext";
-import { initEditorServices, setupTextXLanguageClient } from "../utils/editorUtils";
+import { GRAMMAR_FILE_URI, initEditorServices, setupTextXLanguageClient } from "../utils/editorUtils";
 import { createDefaultGrammarContent, createDefaultModelContent } from "../utils/tempUtils";
 import ShareEditorsContent from "../components/ShareEditorsContent";
+import { EditorStatus, EditorStatusType } from "../types/editorTypes";
+import EditorStatusBar from "../components/EditorStatusBar";
 
 const editorContainerClassNames = "flex flex-col flex-1 border border-gray-100 dark:border-gray-800";
 const editorTitleClassNames = "flex flex-shrink-0 justify-center items-center h-[40px] bg-gray-300 dark:bg-gray-700 font-semibold";
-const statusBarClassNames = "flex flex-shrink-0 px-4 py-1 border-t border-gray-100 dark:border-gray-800 text-sm font-semibold";
 
 function Playground() {
     const [editorServicesInitialized, setEditorServicesInitialized] = useState(false);
     const [textXInitialized, setTextXInitialized] = useState(false);
-    const { setModelEditor, setGrammarEditor } = useEditorsContext();
+    const { setModelEditor, setGrammarEditor, modelEditor, grammarEditor } = useEditorsContext();
+
+    const [grammarStatus, setGrammarStatus] = useState<EditorStatus | undefined>({ type: EditorStatusType.LOADING, message: "Starting textX langauge server..." });
+    const [modelStatus, setModelStatus] = useState<EditorStatus | undefined>();
+
+    const textxWorkerRef = useRef<Worker>();
 
     const searchParams = new URLSearchParams(window.location.search);
     const grammarParam = searchParams.get('grammar');
@@ -32,40 +38,65 @@ function Playground() {
 
     const initTextXWorker = useCallback(async () => {
         const { worker, startedCallback } = await setupTextXLanguageClient();
-        worker.onmessage = (event) => {
+        textxWorkerRef.current = worker;
+        textxWorkerRef.current.addEventListener("message", (event) => {
             if (event.data === 'textx-worker-started') {
                 startedCallback();
                 setTextXInitialized(true);
+                setGrammarStatus(undefined);
+            }
+            if (event.data?.method === "textDocument/publishDiagnostics") {
+                updateEditorStatuses(event.data.params);
+            }
+        });
+    }, []);
+
+    const updateEditorStatuses = useCallback((diagnosticsParams: any) => {
+        const { uri, diagnostics } = diagnosticsParams;
+        const diagnostic = diagnostics?.[0];
+        if (uri === GRAMMAR_FILE_URI) {
+            if (diagnostic) {
+                const isError = diagnostic.severity === 1;
+                const { message } = diagnostic;
+                setGrammarStatus({ 
+                    type: isError ? EditorStatusType.ERROR: EditorStatusType.INFO,
+                    message: message 
+                });
+            } else {
+                setGrammarStatus(undefined);
+            }
+        } else {
+            if (diagnostic) {
+                const isError = diagnostic.severity === 1;
+                const { message, range } = diagnostic;
+                setModelStatus({ 
+                    type: isError ? EditorStatusType.ERROR: EditorStatusType.INFO,
+                    position: [range.start.line, range.start.character],
+                    message: message 
+                });
+            } else {
+                setModelStatus(undefined);
             }
         }
     }, []);
 
-    const getGrammarStatus = () => {
-        let content;
-        if (!textXInitialized) {
-            content = (
-                <>
-                    <Spinner size="sm" />
-                    <span>Initializing TextX server...</span>
-                </>
-            );
-        } else {
-            content = <span>...</span>;
-        }
-        return (
-            <div className="flex flex-row items-center space-x-2">
-                {content}
-            </div>
-        );
-    }
+    useEffect(() => {
+        if (!textXInitialized) return;
 
-    const getModelStatus = () => {
-        return (
-            <div className="flex flex-row items-center space-x-2">
-                <span>...</span>
-            </div>
-        );
-    }
+        if (!grammarStatus && grammarEditor?.getValue() !== "") {
+            setGrammarStatus({ 
+                type: EditorStatusType.SUCCESS,
+                message: "Grammar is valid"
+            })
+        }
+        
+        if (!modelStatus && modelEditor?.getValue() !== "") {
+            setModelStatus({ 
+                type: EditorStatusType.SUCCESS,
+                message: "Model is valid"
+            })
+        }
+    }, [grammarStatus, modelStatus, modelEditor, grammarEditor, textXInitialized]);
 
     return (
         <div className="flex flex-row flex-1 w-full h-full relative">
@@ -82,9 +113,7 @@ function Playground() {
                                 onInitialized={(editor) => setGrammarEditor(editor)}
                                 className={'flex flex-1 shadow-inner'}
                             />
-                            <div className={statusBarClassNames}>
-                                {getGrammarStatus()}
-                            </div>
+                            <EditorStatusBar status={grammarStatus} />
                         </>
                     ) : (
                         <div className="flex flex-1 items-center justify-center">
@@ -106,9 +135,7 @@ function Playground() {
                                 onInitialized={(editor) => setModelEditor(editor)}
                                 className={'flex flex-1 shadow-inner'}
                             />
-                            <div className={statusBarClassNames}>
-                                {getModelStatus()}
-                            </div>
+                            <EditorStatusBar status={modelStatus} />
                         </>
                     ) : (
                         <div className="flex flex-1 items-center justify-center">
