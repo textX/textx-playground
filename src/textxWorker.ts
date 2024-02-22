@@ -6,12 +6,15 @@ const log = (message: string) => console.log(LOG_PREFIX, message);
 
 let pyodideReady: any;
 
-type ScriptName = 'textxInstallation' | 'textxServer' | 'clientMessageHandler';
+type ScriptName = 'textxInstallation' | 'textxServer' | 'languageClientMessageHandler' | 'grammarParser' | 'parseGrammarHandler' | 'textxGrammar';
 
 const scripts = {
   textxInstallation: '',
   textxServer: '',
-  clientMessageHandler: '',
+  languageClientMessageHandler: '',
+  grammarParser: '',
+  parseGrammarHandler: '',
+  textxGrammar: ''
 };
 
 onmessage = async (event) => {
@@ -22,8 +25,12 @@ onmessage = async (event) => {
     for (let key of Object.keys(scripts)) {
       scripts[key as ScriptName] = await getFileContent(event.data.scriptUrls[key]);
     }
-    pyodideReady = await initPyodide();
-    postMessage("textx-worker-started");
+
+    self.GRAMMAR_DOC_URI = event.data.grammarUri;
+    self.MODEL_DOC_URI = event.data.modelUri;
+
+    pyodideReady = await initPyodideTextxServerAndGrammarParser();
+    postMessage({ type: "textx-worker-started" });
     return;
   }
 
@@ -31,14 +38,30 @@ onmessage = async (event) => {
 
   let pyodide = await pyodideReady;
 
-  // variable name (client_message) must mach the one from the processClientMessage.py import
-  /* @ts-ignore */
-  self.client_message = JSON.stringify(event.data);
+  if (event.data.type === 'parse-grammar') {
+    const { grammar, languageId } = event.data;
 
-  await pyodide.runPython(scripts.clientMessageHandler);
+    // language_for_grammar_parsing and grammar_for_parsing variable names must match the ones imported in parseGrammarHandler.py
+    self.language_for_grammar_parsing = languageId;
+    self.grammar_for_parsing = languageId === 'textx' ? scripts.textxGrammar : grammar;
+
+    const grammarInfo = await pyodide.runPython(scripts.parseGrammarHandler);
+    
+    postMessage({ 
+      type: "grammar-parsed",
+      languageId,
+      grammarInfo
+    });
+    return;
+  }
+
+  // language_client_message variable name must match the one imported in languageClientMessageHandler.py
+  self.language_client_message = JSON.stringify(event.data);
+
+  await pyodide.runPython(scripts.languageClientMessageHandler);
 }
 
-async function initPyodide() {
+async function initPyodideTextxServerAndGrammarParser() {
 
   log("Initializing pyodide...");
 
@@ -49,6 +72,7 @@ async function initPyodide() {
 
   await pyodide.loadPackage(["micropip"])
   await pyodide.runPythonAsync(scripts.textxInstallation);
+  await pyodide.runPythonAsync(scripts.grammarParser);
 
   pyodide.globals.get('sys').stdout.write = patchedStdout;
 

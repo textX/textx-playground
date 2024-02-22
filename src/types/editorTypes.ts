@@ -10,3 +10,10 @@ export type EditorStatus = {
     position?: [number, number];
     message: string;
 }
+
+export type GrammarInfo = {
+    name: string;
+    keywords: string[];
+    comments: string[];
+    regexes: string[];
+}

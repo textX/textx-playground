@@ -3,7 +3,7 @@ import LZString from 'lz-string';
 import Editor from "../components/Editor";
 import Spinner from "../components/Spinner";
 import { useEditorsContext } from "../utils/editorContext";
-import { GRAMMAR_FILE_URI, initEditorServices, setupTextXLanguageClient } from "../utils/editorUtils";
+import { GRAMMAR_FILE_URI, initEditorServices, setSyntaxHighlighting, setupTextXLanguageClient } from "../utils/editorUtils";
 import { createDefaultGrammarContent, createDefaultModelContent } from "../utils/tempUtils";
 import ShareEditorsContent from "../components/ShareEditorsContent";
 import { EditorStatus, EditorStatusType } from "../types/editorTypes";
@@ -36,14 +36,23 @@ function Playground() {
         initTextXWorker();
     }, []);
 
+
     const initTextXWorker = useCallback(async () => {
         const { worker, startedCallback } = await setupTextXLanguageClient();
         textxWorkerRef.current = worker;
         textxWorkerRef.current.addEventListener("message", (event) => {
-            if (event.data === 'textx-worker-started') {
+            if (event.data?.type === 'textx-worker-started') {
                 startedCallback();
                 setTextXInitialized(true);
                 setGrammarStatus(undefined);
+                textxWorkerRef.current?.postMessage({
+                    type: "parse-grammar",
+                    languageId: 'textx',
+                });
+            }
+            if (event.data?.type === 'grammar-parsed') {
+                console.log(event.data.grammarInfo);
+                setSyntaxHighlighting(event.data.languageId, JSON.parse(event.data.grammarInfo));
             }
             if (event.data?.method === "textDocument/publishDiagnostics") {
                 updateEditorStatuses(event.data.params);
@@ -87,10 +96,15 @@ function Playground() {
             setGrammarStatus({ 
                 type: EditorStatusType.SUCCESS,
                 message: "Grammar is valid"
-            })
+            });
+            textxWorkerRef.current?.postMessage({
+                type: "parse-grammar",
+                languageId: 'demo',
+                grammar: grammarEditor?.getValue()
+            });
         }
         
-        if (!modelStatus && modelEditor?.getValue() !== "") {
+        if (!modelStatus && modelEditor?.getValue() !== "" && grammarStatus?.type === EditorStatusType.SUCCESS) {
             setModelStatus({ 
                 type: EditorStatusType.SUCCESS,
                 message: "Model is valid"

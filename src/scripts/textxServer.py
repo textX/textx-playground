@@ -2,9 +2,7 @@ from lsprotocol.types import (TEXT_DOCUMENT_DID_CHANGE, TEXT_DOCUMENT_DID_CLOSE,
 from pygls.server import LanguageServer
 from textx import metamodel_from_str, exceptions
 
-
-GRAMMAR_DOC_URI = 'inmemory://model/1'
-MODEL_DOC_URI = 'inmemory://model/2'
+from js import GRAMMAR_DOC_URI, MODEL_DOC_URI
 
 
 server = LanguageServer('textx-ls', '0.0.1')
@@ -41,8 +39,6 @@ def validate(ls, params):
         grammar_doc = docs[GRAMMAR_DOC_URI]
         model_doc = text_doc
 
-    metamodel = None
-    
     if not grammar_doc.source:
         ls.show_message_log('Metamodel is empty')
         ls.publish_diagnostics(grammar_doc.uri, grammar_diagnostics)
@@ -50,6 +46,8 @@ def validate(ls, params):
         return
 
     ls.show_message_log('Validate metamodel')
+    
+    metamodel = None
     
     try:
         metamodel = metamodel_from_str(grammar_doc.source)
@@ -83,5 +81,8 @@ def validate(ls, params):
         ls.publish_diagnostics(model_doc.uri, model_diagnostics)
         return
     
+    ls.publish_diagnostics(grammar_doc.uri, grammar_diagnostics)
+    ls.publish_diagnostics(model_doc.uri, model_diagnostics)
+
 
 server.start_pyodide()

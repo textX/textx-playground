@@ -33,8 +33,13 @@ export const setupTextXLanguageClient = async (): Promise<{ worker: Worker, star
     scriptUrls: {
       textxInstallation: (new URL('../scripts/textxInstallation.py', import.meta.url)).toString(),
       textxServer: (new URL('../scripts/textxServer.py', import.meta.url)).toString(),
-      clientMessageHandler: (new URL('../scripts/clientMessageHandler.py', import.meta.url)).toString()
-    }
+      languageClientMessageHandler: (new URL('../scripts/languageClientMessageHandler.py', import.meta.url)).toString(),
+      grammarParser: (new URL('../scripts/grammarParser.py', import.meta.url)).toString(),
+      parseGrammarHandler: (new URL('../scripts/parseGrammarHandler.py', import.meta.url)).toString(),
+      textxGrammar: (new URL('../scripts/textx.tx', import.meta.url)).toString(),
+    },
+    grammarUri: GRAMMAR_FILE_URI,
+    modelUri: MODEL_FILE_URI,
   });
   return {
     worker,
@@ -96,3 +101,67 @@ export const createEditor = async (config: {
 
   return monacoEditor;
 };
+
+export const setSyntaxHighlighting = (languageId: string, grammarInfo: any) => {
+  if (languageId === 'textx') {
+    languages.setMonarchTokensProvider(languageId, {
+      keywords: grammarInfo.keywords.filter((k: string) => !k.startsWith('\\\\')),
+
+      escapes: /\\(?:[abfnrtv\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/,
+
+      tokenizer: {
+        root: [
+          [/[A-Za-z_$][\w$]*/, {
+            cases: {
+              '@keywords': 'keyword',
+              '@default': 'identifier'
+            }
+          }],
+
+          [/'([^'\\]|\\.)*$/, 'string.invalid'],
+          [/'/, 'string', '@string'],
+
+          { include: '@comment' },
+          { include: '@whitespace' },
+        ],
+
+        string: [
+          [/[^\\']+/, 'string'],
+          [/@escapes/, 'string.escape'],
+          [/\\./, 'string.escape.invalid'],
+          [/'/, 'string', '@pop']
+        ],
+
+        comment: grammarInfo.comments.map((c: string) => ([new RegExp(c), 'comment'])),
+
+        whitespace: [
+          [/[ \t\r\n]+/, 'white'],
+        ],
+      },
+    });
+  } else {
+    languages.setMonarchTokensProvider(languageId, {
+      keywords: grammarInfo.keywords.filter((k: string) => !k.startsWith('\\\\')),
+
+      tokenizer: {
+        root: [
+          [/[A-Za-z_$][\w$]*/, {
+            cases: {
+              '@keywords': 'keyword',
+              '@default': 'identifier'
+            }
+          }],
+
+          { include: '@comment' },
+          { include: '@whitespace' },
+        ],
+
+        comment: grammarInfo.comments.map((c: string) => ([new RegExp(c), 'comment'])),
+
+        whitespace: [
+          [/[ \t\r\n]+/, 'white'],
+        ],
+      },
+    });
+  }
+}

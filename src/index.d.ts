@@ -10,3 +10,13 @@ declare module "*.svg" {
     const value: string;
     export = value;
 }
+
+declare global {
+    interface Window { 
+        language_client_message: string;
+        language_for_grammar_parsing: string;
+        grammar_for_parsing: string;
+        GRAMMAR_DOC_URI: string;
+        MODEL_DOC_URI: string;
+    }
+}
