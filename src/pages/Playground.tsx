@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from "react";
 import LZString from 'lz-string';
-import Editor from "../components/Editor";
-import Spinner from "../components/Spinner";
+import { useCallback, useEffect, useRef, useState } from "react";
+import Editor from "../components/editor/Editor";
+import EditorStatusBar from "../components/editor/EditorStatusBar";
+import ShareEditorsContent from "../components/editor/ShareEditorsContent";
+import Spinner from "../components/common/Spinner";
+import { EditorStatus, EditorStatusType } from "../types/editorTypes";
 import { useEditorsContext } from "../utils/editorContext";
 import { GRAMMAR_FILE_URI, initEditorServices, setSyntaxHighlighting, setupTextXLanguageClient } from "../utils/editorUtils";
-import { createDefaultGrammarContent, createDefaultModelContent } from "../utils/tempUtils";
-import ShareEditorsContent from "../components/ShareEditorsContent";
-import { EditorStatus, EditorStatusType } from "../types/editorTypes";
-import EditorStatusBar from "../components/EditorStatusBar";
 
 const editorContainerClassNames = "flex flex-col flex-1 border border-gray-100 dark:border-gray-800";
 const editorTitleClassNames = "flex flex-shrink-0 justify-center items-center h-[40px] bg-gray-300 dark:bg-gray-700 font-semibold";
@@ -51,7 +50,6 @@ function Playground() {
                 });
             }
             if (event.data?.type === 'grammar-parsed') {
-                console.log(event.data.grammarInfo);
                 setSyntaxHighlighting(event.data.languageId, JSON.parse(event.data.grammarInfo));
             }
             if (event.data?.method === "textDocument/publishDiagnostics") {
@@ -123,7 +121,7 @@ function Playground() {
                                 languageId={'textx'}
                                 languageExtension={'tx'}
                                 fileName={'grammar'}
-                                defaultCode={grammarParam ? LZString.decompressFromEncodedURIComponent(grammarParam) : createDefaultGrammarContent()}
+                                defaultCode={grammarParam ? LZString.decompressFromEncodedURIComponent(grammarParam) : ''}
                                 onInitialized={(editor) => setGrammarEditor(editor)}
                                 className={'flex flex-1 shadow-inner'}
                             />
@@ -145,7 +143,7 @@ function Playground() {
                                 languageId={'demo'}
                                 languageExtension={'demo'}
                                 fileName={'model'}
-                                defaultCode={modelParam ? LZString.decompressFromEncodedURIComponent(modelParam) : createDefaultModelContent()}
+                                defaultCode={modelParam ? LZString.decompressFromEncodedURIComponent(modelParam) : ''}
                                 onInitialized={(editor) => setModelEditor(editor)}
                                 className={'flex flex-1 shadow-inner'}
                             />

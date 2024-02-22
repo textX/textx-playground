@@ -1,9 +1,9 @@
 import { ShareIcon } from "@heroicons/react/24/outline";
-import Tooltip from "./Tooltip";
+import Tooltip from "../common/Tooltip";
 import LZString from 'lz-string';
 import { useState } from "react";
-import { copyText } from "../utils/textUtils";
-import { useEditorsContext } from "../utils/editorContext";
+import { copyText } from "../../utils/textUtils";
+import { useEditorsContext } from "../../utils/editorContext";
 
 export default function ShareEditorsContent() {
     const [isCopied, setIsCopied] = useState(false);

@@ -1,7 +1,7 @@
 
-import GithubLogoUrl from '../assets/github-logo.svg';
+import GithubLogoUrl from '../../assets/githubLogo.svg';
 import ThemeToggler from './ThemeToggler';
-import textXLogoUrl from '/textx-logo.png';
+import textXLogoUrl from '/textxLogo.png';
 
 export default function Header() {
     return (

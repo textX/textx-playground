@@ -1,6 +1,6 @@
 import { MoonIcon, SunIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
-import { useEditorsContext } from '../utils/editorContext';
+import { useEditorsContext } from '../../utils/editorContext';
 
 export default function ThemeToggler() {
   const [theme, setTheme] = useState<'light' | 'dark'>();

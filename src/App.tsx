@@ -1,4 +1,4 @@
-import Header from "./components/Header";
+import Header from "./components/header/Header";
 import Playground from "./pages/Playground";
 import { EditorsProvider } from "./utils/editorContext";
 

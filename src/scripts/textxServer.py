@@ -9,13 +9,11 @@ server = LanguageServer('textx-ls', '0.0.1')
 
 @server.feature(TEXT_DOCUMENT_DID_CHANGE)
 def did_change(ls, params):
-    ls.show_message_log('Document changed')
     validate(ls, params)
 
 
 @server.feature(TEXT_DOCUMENT_DID_OPEN)
 def did_open(ls, params):
-    ls.show_message_log('Document open')
     validate(ls, params) 
 
 
@@ -45,8 +43,6 @@ def validate(ls, params):
         ls.publish_diagnostics(model_doc.uri, model_diagnostics)
         return
 
-    ls.show_message_log('Validate metamodel')
-    
     metamodel = None
     
     try:
@@ -63,8 +59,6 @@ def validate(ls, params):
         ls.publish_diagnostics(grammar_doc.uri, grammar_diagnostics)
         ls.publish_diagnostics(model_doc.uri, model_diagnostics)
         return
-
-    ls.show_message_log('Validate model')
 
     try:        
         metamodel.model_from_str(model_doc.source)

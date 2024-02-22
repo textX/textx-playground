@@ -1,6 +1,6 @@
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
-import { EditorStatus, EditorStatusType } from "../types/editorTypes";
-import Spinner from "./Spinner";
+import { EditorStatus, EditorStatusType } from "../../types/editorTypes";
+import Spinner from "../common/Spinner";
 
 const statusBarClassNames = "flex flex-shrink-0 px-4 py-1 border-t border-gray-100 dark:border-gray-800 text-sm font-semibold";
 

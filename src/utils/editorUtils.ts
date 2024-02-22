@@ -82,7 +82,7 @@ export const createEditor = async (config: {
   content: string,
 }) => {
   const { languageId, languageExtension, fileName } = config;
-  console.log(fileName)
+  console.log(`Create ${fileName} editor`)
 
   languages.register({
     id: languageId,

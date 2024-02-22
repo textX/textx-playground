@@ -23,7 +23,7 @@ onmessage = async (event) => {
     log(event.data)
 
     for (let key of Object.keys(scripts)) {
-      scripts[key as ScriptName] = await getFileContent(event.data.scriptUrls[key]);
+      scripts[key as ScriptName] = await getScriptContent(event.data.scriptUrls[key]);
     }
 
     self.GRAMMAR_DOC_URI = event.data.grammarUri;
@@ -85,7 +85,7 @@ async function initPyodideTextxServerAndGrammarParser() {
   return pyodide;
 }
 
-async function getFileContent(url: string): Promise<string> {
+async function getScriptContent(url: string): Promise<string> {
   try {
     const response = await fetch(url);
     if (!response.ok) {

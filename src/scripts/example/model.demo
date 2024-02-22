@@ -1,0 +1,10 @@
+shape black_and_white
+    line E 150
+    line NW 71
+    line W 50
+    line SW 71
+end
+
+shape triangle
+    liness
+`

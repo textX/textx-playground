@@ -1,5 +1,4 @@
-export const createDefaultGrammarContent = (): string => {
-    return `Scene:
+Scene:
     /* The root rule */
     shapes*=Shape //First, define some shapes
     draw_instructions*=DrawInstruction //Then, tell the turtle to draw them
@@ -50,19 +49,5 @@ Position:
 ;
 
 Comment:
-    /\\/\\*(.|\\n)*?\\*\\// | /\\/\\/.*?$/
-;`;
-};
-
-export const createDefaultModelContent = (): string => {
-    return `shape black_and_white
-    line E 150
-    line NW 71
-    line W 50
-    line SW 71
-end
-
-shape triangle
-    liness
-`;
-};
+    /\\/\\/.*?$/
+;
