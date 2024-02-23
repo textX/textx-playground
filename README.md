@@ -1,30 +1,37 @@
-# React + TypeScript + Vite
+# textX Playground
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project represents a playground for textX language. Users can define a new language by specifying its grammar using textX. They can also create a program that should follow the grammar of the defined language.
 
-Currently, two official plugins are available:
+Some parts of the code are taken from the following projects:
+- [textX-LS](https://github.com/textX/textX-LS) - textX server implementation with pygls
+- [textx-gen-coloring](https://github.com/textX/textx-gen-coloring) - grammar parser for syntax highlighting
+- [monaco-languageclient](https://github.com/TypeFox/monaco-languageclient) language client creation with language server running in web worker
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Functionalities
 
-## Expanding the ESLint configuration
+This is a web application with only one page, containing a header and two code editors. 
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+One editor is used for specifying language grammar and the second for defining a model (program) using newly defined language. Each editor contains the status bar, which has one of the following states:
+- loading - until textX server is started
+- error - shows error in grammar/model with message and position (row, column)
+- valid - grammar/model is valid
 
-- Configure the top-level `parserOptions` property like this:
+The header contains textX logo, toggler between light and dark theme, and links to documentation and GitHub repository.
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+Grammar and model content can be shared via link by clicking the share icon in the top right corner. Their content is shortened using LZ compression and embedded into the URL link as a query parameter. When this link is opened, the editors' content is restored from the query parameter.
+
+Basic syntax highlighting is implemented. Grammar and model keywords and comments are highlighted.
+
+## Development
+
+After cloning the repo and installing dependencies with `npm i` command, the project is started by running:
+
+```
+npm run dev -- --port 3000
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+The project is built with:
+
+```
+npm run build
+```
