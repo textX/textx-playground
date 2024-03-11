@@ -5,7 +5,9 @@ This project represents a playground for textX language. Users can define a new 
 Some parts of the code are taken from the following projects:
 - [textX-LS](https://github.com/textX/textX-LS) - textX server implementation with pygls
 - [textx-gen-coloring](https://github.com/textX/textx-gen-coloring) - grammar parser for syntax highlighting
-- [monaco-languageclient](https://github.com/TypeFox/monaco-languageclient) language client creation with language server running in web worker
+- [monaco-languageclient](https://github.com/TypeFox/monaco-languageclient) - language client creation with language server running in web worker
+
+The project is deployed and you can create and validate your new language using textX at [textx.github.io/textx-playground](https://textx.github.io/textx-playground).
 
 ## Functionalities
 
