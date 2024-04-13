@@ -6,7 +6,7 @@ const log = (message: string) => console.log(LOG_PREFIX, message);
 
 let pyodideReady: any;
 
-type ScriptName = 'textxInstallation' | 'textxServer' | 'languageClientMessageHandler' | 'grammarParser' | 'parseGrammarHandler' | 'textxGrammar';
+type ScriptName = 'textxInstallation' | 'textxServer' | 'languageClientMessageHandler' | 'grammarParser' | 'parseGrammarHandler' | 'textxGrammar' | 'visualizeGrammarHandler' | 'visualizeModelHandler';
 
 const scripts = {
   textxInstallation: '',
@@ -14,7 +14,9 @@ const scripts = {
   languageClientMessageHandler: '',
   grammarParser: '',
   parseGrammarHandler: '',
-  textxGrammar: ''
+  textxGrammar: '',
+  visualizeGrammarHandler: '',
+  visualizeModelHandler: '',
 };
 
 onmessage = async (event) => {
@@ -46,12 +48,45 @@ onmessage = async (event) => {
     self.grammar_for_parsing = languageId === 'textx' ? scripts.textxGrammar : grammar;
 
     const grammarInfo = await pyodide.runPython(scripts.parseGrammarHandler);
-    
-    postMessage({ 
+
+    postMessage({
       type: "grammar-parsed",
       languageId,
       grammarInfo
     });
+    return;
+  }
+
+  if (event.data.type === 'visualize-grammar') {
+    const { grammar } = event.data;
+
+    // grammar_for_visualization variable name must match the one imported in visualizeGrammarHandler.py
+    self.grammar_for_visualization = grammar;
+
+    const visualizedGrammar = await pyodide.runPython(scripts.visualizeGrammarHandler);
+
+    postMessage({
+      type: "grammar-visualized",
+      data: visualizedGrammar
+    });
+
+    return;
+  }
+
+  if (event.data.type === 'visualize-model') {
+    const { model, grammar } = event.data;
+
+    // model_for_visualization and grammar_for_visualization variables name must match the ones imported in visualizeModelHandler.py
+    self.model_for_visualization = model;
+    self.grammar_for_visualization = grammar;
+
+    const visualizedModel = await pyodide.runPython(scripts.visualizeModelHandler);
+
+    postMessage({
+      type: "model-visualized",
+      data: visualizedModel
+    });
+
     return;
   }
 

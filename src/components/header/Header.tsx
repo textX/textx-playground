@@ -6,7 +6,7 @@ import textXLogoUrl from '/textxLogo.png';
 
 export default function Header() {
     return (
-        <header className="dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 h-[80px] flex flex-row item-center justify-between py-4 px-10">
+        <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 h-[80px] flex flex-row item-center justify-between py-4 px-10">
             <div className={'relative h-full flex w-40'}>
                 <img
                     src={textXLogoUrl}

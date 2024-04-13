@@ -16,6 +16,8 @@ declare global {
         language_client_message: string;
         language_for_grammar_parsing: string;
         grammar_for_parsing: string;
+        grammar_for_visualization: string;
+        model_for_visualization: string;
         GRAMMAR_DOC_URI: string;
         MODEL_DOC_URI: string;
     }

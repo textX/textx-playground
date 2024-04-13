@@ -1,9 +1,9 @@
 import { ShareIcon } from "@heroicons/react/24/outline";
-import Tooltip from "../common/Tooltip";
 import LZString from 'lz-string';
 import { useState } from "react";
-import { copyText } from "../../utils/textUtils";
 import { useEditorsContext } from "../../utils/editorContext";
+import { copyText } from "../../utils/textUtils";
+import Tooltip from "../common/Tooltip";
 
 const MAX_URL_LENGTH = 2048;
 
@@ -20,8 +20,8 @@ export default function ShareEditorsContent() {
         setIsTooLong(false);
       }}
     >
-      <ShareIcon
-        className='h-5 w-5 text-blue-500 cursor-pointer'
+      <button
+        className="flex items-center justify-center rounded-full p-3 shadow-md bg-white dark:bg-gray-900"
         onClick={async () => {
           if (!grammarEditor || !modelEditor) {
             return;
@@ -39,7 +39,11 @@ export default function ShareEditorsContent() {
             setIsCopied(true);
           }
         }}
-      />
+      >
+        <ShareIcon
+          className='h-6 w-6 text-blue-500'
+        />
+      </button>
     </Tooltip>
   )
 }
