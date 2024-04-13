@@ -37,6 +37,8 @@ export const setupTextXLanguageClient = async (): Promise<{ worker: Worker, star
       grammarParser: (new URL('../scripts/grammarParser.py', import.meta.url)).toString(),
       parseGrammarHandler: (new URL('../scripts/parseGrammarHandler.py', import.meta.url)).toString(),
       textxGrammar: (new URL('../scripts/textx.tx', import.meta.url)).toString(),
+      visualizeGrammarHandler: (new URL('../scripts/visualizeGrammarHandler.py', import.meta.url)).toString(),
+      visualizeModelHandler: (new URL('../scripts/visualizeModelHandler.py', import.meta.url)).toString(),
     },
     grammarUri: GRAMMAR_FILE_URI,
     modelUri: MODEL_FILE_URI,
