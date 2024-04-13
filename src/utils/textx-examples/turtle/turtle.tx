@@ -1,3 +1,5 @@
+/* source: https://github.com/Strumenta/textx-tutorial/blob/master/tx_turtle/turtle.tx */
+
 Scene:
     /* The root rule */
     shapes*=Shape //First, define some shapes
@@ -49,5 +51,5 @@ Position:
 ;
 
 Comment:
-    /\\/\\/.*?$/
+    /\/\*(.|\n)*?\*\// | /\/\/.*?$/
 ;

@@ -1,8 +1,6 @@
 import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js';
 import React, { createRef, useEffect, useRef } from 'react';
 import { createEditor } from '../../utils/editorUtils';
-import defaultGrammarCode from '../../scripts/example/demo.tx?raw';
-import defaultModelCode from '../../scripts/example/model.demo?raw';
 
 export type EditorProps = {
   languageId: string;
@@ -35,7 +33,7 @@ const Editor: React.FC<EditorProps> = (
           languageExtension,
           fileName,
           htmlElement: ref.current!,
-          content: defaultCode || (languageId === 'textx' ? defaultGrammarCode : defaultModelCode),
+          content: defaultCode,
         });
         // @ts-ignore
         onInitialized?.(monacoEditor);

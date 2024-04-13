@@ -1,5 +1,6 @@
 
 import GithubLogoUrl from '../../assets/githubLogo.svg';
+import ExampleSelection from './ExampleSelection';
 import ThemeToggler from './ThemeToggler';
 import textXLogoUrl from '/textxLogo.png';
 
@@ -14,6 +15,7 @@ export default function Header() {
                 />
             </div>
             <nav className="flex flex-row items-center space-x-8">
+                <ExampleSelection />
                 <a href={'https://textx.github.io/textX/stable/'} target={'_blank'} className="font-semibold">Documentation</a>
                 <ThemeToggler />
                 <a href={'https://github.com/textX/textX'} target={'_blank'}>

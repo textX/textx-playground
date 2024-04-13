@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 type Props = {
     content: string;
-    children: ReactNode | string;
+    children: ReactNode;
     onHoverOut?: () => void;
 };
 
