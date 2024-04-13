@@ -1,0 +1,15 @@
+Calc: assignments*=Assignment expression=Expression;
+
+Assignment: variable=ID '=' expression=Expression ';';
+
+Expression: op=Term (op=PlusOrMinus op=Term)* ;
+
+PlusOrMinus: '+' | '-';
+
+Term: op=Factor (op=MulOrDiv op=Factor)*;
+
+MulOrDiv: '*' | '/' ;
+
+Factor: (sign=PlusOrMinus)?  op=Operand;
+
+Operand: op=NUMBER | op=ID | ('(' op=Expression ')');

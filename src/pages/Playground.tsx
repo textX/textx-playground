@@ -1,9 +1,9 @@
 import LZString from 'lz-string';
 import { useCallback, useEffect, useRef, useState } from "react";
+import Spinner from "../components/common/Spinner";
 import Editor from "../components/editor/Editor";
 import EditorStatusBar from "../components/editor/EditorStatusBar";
 import ShareEditorsContent from "../components/editor/ShareEditorsContent";
-import Spinner from "../components/common/Spinner";
 import { EditorStatus, EditorStatusType } from "../types/editorTypes";
 import { useEditorsContext } from "../utils/editorContext";
 import { GRAMMAR_FILE_URI, initEditorServices, setSyntaxHighlighting, setupTextXLanguageClient } from "../utils/editorUtils";
@@ -65,9 +65,9 @@ function Playground() {
             if (diagnostic) {
                 const isError = diagnostic.severity === 1;
                 const { message } = diagnostic;
-                setGrammarStatus({ 
-                    type: isError ? EditorStatusType.ERROR: EditorStatusType.INFO,
-                    message: message 
+                setGrammarStatus({
+                    type: isError ? EditorStatusType.ERROR : EditorStatusType.INFO,
+                    message: message
                 });
             } else {
                 setGrammarStatus(undefined);
@@ -76,10 +76,10 @@ function Playground() {
             if (diagnostic) {
                 const isError = diagnostic.severity === 1;
                 const { message, range } = diagnostic;
-                setModelStatus({ 
-                    type: isError ? EditorStatusType.ERROR: EditorStatusType.INFO,
+                setModelStatus({
+                    type: isError ? EditorStatusType.ERROR : EditorStatusType.INFO,
                     position: [range.start.line, range.start.character],
-                    message: message 
+                    message: message
                 });
             } else {
                 setModelStatus(undefined);
@@ -91,7 +91,7 @@ function Playground() {
         if (!textXInitialized) return;
 
         if (!grammarStatus && grammarEditor?.getValue() !== "") {
-            setGrammarStatus({ 
+            setGrammarStatus({
                 type: EditorStatusType.SUCCESS,
                 message: "Grammar is valid"
             });
@@ -101,14 +101,17 @@ function Playground() {
                 grammar: grammarEditor?.getValue()
             });
         }
-        
+
         if (!modelStatus && modelEditor?.getValue() !== "" && grammarStatus?.type === EditorStatusType.SUCCESS) {
-            setModelStatus({ 
+            setModelStatus({
                 type: EditorStatusType.SUCCESS,
                 message: "Model is valid"
             })
         }
     }, [grammarStatus, modelStatus, modelEditor, grammarEditor, textXInitialized]);
+
+    const grammarCode = grammarParam ? LZString.decompressFromEncodedURIComponent(grammarParam) : '';
+    const modelCode = modelParam ? LZString.decompressFromEncodedURIComponent(modelParam) : '';
 
     return (
         <div className="flex flex-row flex-1 w-full h-full relative">
@@ -121,7 +124,7 @@ function Playground() {
                                 languageId={'textx'}
                                 languageExtension={'tx'}
                                 fileName={'grammar'}
-                                defaultCode={grammarParam ? LZString.decompressFromEncodedURIComponent(grammarParam) : ''}
+                                defaultCode={grammarCode}
                                 onInitialized={(editor) => setGrammarEditor(editor)}
                                 className={'flex flex-1 shadow-inner'}
                             />
@@ -143,7 +146,7 @@ function Playground() {
                                 languageId={'demo'}
                                 languageExtension={'demo'}
                                 fileName={'model'}
-                                defaultCode={modelParam ? LZString.decompressFromEncodedURIComponent(modelParam) : ''}
+                                defaultCode={modelCode}
                                 onInitialized={(editor) => setModelEditor(editor)}
                                 className={'flex flex-1 shadow-inner'}
                             />

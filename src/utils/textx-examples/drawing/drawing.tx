@@ -1,0 +1,17 @@
+Model: commands*=DrawCommand;
+
+DrawCommand: MoveCommand | ShapeCommand;
+
+ShapeCommand: LineTo | Circle;
+
+MoveCommand: MoveTo | MoveBy;
+
+MoveTo: 'move' 'to' position=Point;
+
+MoveBy: 'move' 'by' vector=Point;
+
+Circle: 'circle' radius=INT;
+
+LineTo: 'line' 'to' point=Point;
+
+Point: x=INT ',' y=INT;
