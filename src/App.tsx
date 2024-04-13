@@ -1,7 +1,7 @@
 import Header from "./components/header/Header";
 import Playground from "./pages/Playground";
-import { EditorsProvider } from "./utils/editorContext";
-import { TextxWorkerProvider } from "./utils/textxWorkerContext";
+import { EditorsProvider } from "./context/editorContext";
+import { TextxWorkerProvider } from "./context/textxWorkerContext";
 
 function App() {
 

@@ -6,17 +6,23 @@ import EditorStatusBar from "../components/editor/EditorStatusBar";
 import ShareEditorsContent from "../components/editor/ShareEditorsContent";
 import VisualizeContent from '../components/editor/VisualizeContent';
 import { EditorStatusType } from "../types/editorTypes";
-import { useEditorsContext } from "../utils/editorContext";
+import { useEditorsContext } from "../context/editorContext";
 import { GRAMMAR_FILE_URI, initEditorServices, setSyntaxHighlighting, setupTextXLanguageClient } from "../utils/editorUtils";
-import { useTextxWorkerContext } from '../utils/textxWorkerContext';
+import { useTextxWorkerContext } from '../context/textxWorkerContext';
+import { instance } from "@viz-js/viz";
+import Modal from '../components/common/Modal';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 const editorContainerClassNames = "flex flex-col flex-1 border border-gray-100 dark:border-gray-800";
-const editorTitleClassNames = "flex flex-shrink-0 justify-between items-center h-[40px] bg-gray-300 dark:bg-gray-700 font-semibold px-5";
+const editorTitleClassNames = "flex flex-shrink-0 justify-between items-center h-[40px] bg-gray-300 dark:bg-gray-700 font-semibold px-3";
+
+const visualizationCanvasElementId = 'visualization-canvas';
 
 function Playground() {
     const [editorServicesInitialized, setEditorServicesInitialized] = useState(false);
     const [textXInitialized, setTextXInitialized] = useState(false);
     const { setModelEditor, setGrammarEditor, modelEditor, grammarEditor, grammarStatus, setGrammarStatus, modelStatus, setModelStatus } = useEditorsContext();
+    const [visulizationGraph, setVisualizationGraph] = useState<SVGSVGElement>();
 
     const { textxWorkerRef } = useTextxWorkerContext();
 
@@ -55,14 +61,27 @@ function Playground() {
                 updateEditorStatuses(event.data.params);
             }
             if (event.data?.type === 'grammar-visualized') {
-                console.log(event.data?.data);
+                instance().then(viz => {
+                    const vizGraph = viz.renderSVGElement(event.data?.data);
+                    setVisualizationGraph(vizGraph);
+                });
             }
             if (event.data?.type === 'model-visualized') {
-                console.log(event.data?.data);
+                instance().then(viz => {
+                    const vizGraph = viz.renderSVGElement(event.data?.data);
+                    setVisualizationGraph(vizGraph);
+                });
             }
         });
-
     }, []);
+
+    useEffect(() => {
+        if (visulizationGraph) {
+            setTimeout(() => {
+                document.getElementById(visualizationCanvasElementId)?.appendChild(visulizationGraph);
+            }, 10);
+        }
+    }, [visulizationGraph]);
 
     const updateEditorStatuses = useCallback((diagnosticsParams: any) => {
         const { uri, diagnostics } = diagnosticsParams;
@@ -150,7 +169,7 @@ function Playground() {
             <div className={editorContainerClassNames}>
                 <div className={editorTitleClassNames}>
                     <span />
-                    <span>Model</span>
+                    <span>Model (Program)</span>
                     <VisualizeContent type="model" />
                 </div>
                 <div className="flex flex-col flex-1">
@@ -176,6 +195,16 @@ function Playground() {
             <div className="absolute bottom-14 right-10 z-10">
                 <ShareEditorsContent />
             </div>
+            <Modal
+                open={!!visulizationGraph}
+                onClose={() => setVisualizationGraph(undefined)}
+                className='p-5'
+            >
+                <button onClick={() => setVisualizationGraph(undefined)}>
+                    <XMarkIcon className="absolute top-5 right-5 w-6 h-6 stroke-2 stroke-gray-800" />
+                </button>
+                <div id={visualizationCanvasElementId} className='flex justify-center overflow-auto' />
+            </Modal>
         </div>
     )
 }

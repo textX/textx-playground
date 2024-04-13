@@ -2,12 +2,12 @@ import { useState } from "react";
 import ConfirmationDialog from "../common/ConfirmationDialog";
 import Dropdown from "../common/Dropdown";
 import textxExamples, { TextxExample, getTextxExampleCode } from "../../utils/textxExamples";
-import { useEditorsContext } from "../../utils/editorContext";
+import { useEditorsContext } from "../../context/editorContext";
 import Spinner from "../common/Spinner";
 
 export default function ExampleSelection() {
     const [choseExample, setChoseExample] = useState<TextxExample>();
-    const [isLoading, setIsLoading] = useState<boolean>();
+    const [isLoading, setIsLoading] = useState(false);
 
     const { grammarEditor, modelEditor } = useEditorsContext()
 

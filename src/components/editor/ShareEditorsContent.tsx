@@ -1,7 +1,7 @@
 import { ShareIcon } from "@heroicons/react/24/outline";
 import LZString from 'lz-string';
 import { useState } from "react";
-import { useEditorsContext } from "../../utils/editorContext";
+import { useEditorsContext } from "../../context/editorContext";
 import { copyText } from "../../utils/textUtils";
 import Tooltip from "../common/Tooltip";
 

@@ -1,7 +1,7 @@
 import { PhotoIcon } from "@heroicons/react/24/outline";
 import Tooltip from "../common/Tooltip";
-import { useEditorsContext } from "../../utils/editorContext";
-import { useTextxWorkerContext } from "../../utils/textxWorkerContext";
+import { useEditorsContext } from "../../context/editorContext";
+import { useTextxWorkerContext } from "../../context/textxWorkerContext";
 import { EditorStatusType } from "../../types/editorTypes";
 import cn from "../../utils/cn";
 
