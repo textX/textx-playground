@@ -30,7 +30,9 @@ export default function ShareEditorsContent() {
           const grammarContentCompressed = LZString.compressToEncodedURIComponent(grammarContent);
           const modelContent = modelEditor.getValue();
           const modelContentCompressed = LZString.compressToEncodedURIComponent(modelContent);
-          const link = `${window.location.href}?grammar=${grammarContentCompressed}&model=${modelContentCompressed}`;
+          const { origin, pathname } = window.location;
+          const baseUrl = `${origin}${pathname}`;
+          const link = `${baseUrl}?grammar=${grammarContentCompressed}&model=${modelContentCompressed}`;
           if (link.length > MAX_URL_LENGTH) {
             setIsTooLong(true);
             return;
