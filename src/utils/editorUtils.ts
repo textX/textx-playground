@@ -1,4 +1,5 @@
-import { languages } from "monaco-editor";
+import { editor, languages, Uri } from "monaco-editor";
+import 'monaco-editor/esm/vs/editor/contrib/suggest/browser/suggestController.js';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import { MonacoLanguageClient, initServices } from "monaco-languageclient";
 import { CloseAction, ErrorAction, MessageTransports } from "vscode-languageclient";
@@ -33,6 +34,7 @@ export const setupTextXLanguageClient = async (): Promise<{ worker: Worker, star
     scriptUrls: {
       textxInstallation: (new URL('../scripts/textxInstallation.py', import.meta.url)).toString(),
       textxServer: (new URL('../scripts/textxServer.py', import.meta.url)).toString(),
+      completion: (new URL('../scripts/completion.py', import.meta.url)).toString(),
       languageClientMessageHandler: (new URL('../scripts/languageClientMessageHandler.py', import.meta.url)).toString(),
       grammarParser: (new URL('../scripts/grammarParser.py', import.meta.url)).toString(),
       parseGrammarHandler: (new URL('../scripts/parseGrammarHandler.py', import.meta.url)).toString(),
@@ -76,7 +78,7 @@ export const createLanguageClient = (transports: MessageTransports): MonacoLangu
   });
 };
 
-export const createEditor = async (config: {
+export const createEditor = (config: {
   languageId: string,
   languageExtension: string,
   fileName: string;
@@ -92,8 +94,10 @@ export const createEditor = async (config: {
   });
 
   const monacoEditor = createConfiguredEditor(config.htmlElement, {
-    language: languageId,
-    value: config.content,
+    model: editor.createModel(config.content, languageId,
+      Uri.parse(languageId === 'textx' ? GRAMMAR_FILE_URI : MODEL_FILE_URI)),
+    quickSuggestions: { other: true, comments: false, strings: false },
+    suggestOnTriggerCharacters: true,
     glyphMargin: true,
     lightbulb: {
       enabled: true
@@ -101,7 +105,8 @@ export const createEditor = async (config: {
     automaticLayout: true,
   });
 
-  return monacoEditor;
+  // Vite deduplicates Monaco at runtime; vscode ships a second copy of its types.
+  return monacoEditor as unknown as editor.IStandaloneCodeEditor;
 };
 
 export const setSyntaxHighlighting = (languageId: string, grammarInfo: any) => {

@@ -6,11 +6,12 @@ const log = (message: string) => console.log(LOG_PREFIX, message);
 
 let pyodideReady: any;
 
-type ScriptName = 'textxInstallation' | 'textxServer' | 'languageClientMessageHandler' | 'grammarParser' | 'parseGrammarHandler' | 'textxGrammar' | 'visualizeGrammarHandler' | 'visualizeModelHandler';
+type ScriptName = 'textxInstallation' | 'textxServer' | 'completion' | 'languageClientMessageHandler' | 'grammarParser' | 'parseGrammarHandler' | 'textxGrammar' | 'visualizeGrammarHandler' | 'visualizeModelHandler';
 
 const scripts = {
   textxInstallation: '',
   textxServer: '',
+  completion: '',
   languageClientMessageHandler: '',
   grammarParser: '',
   parseGrammarHandler: '',
@@ -108,6 +109,7 @@ async function initPyodideTextxServerAndGrammarParser() {
   await pyodide.loadPackage(["micropip"])
   await pyodide.runPythonAsync(scripts.textxInstallation);
   await pyodide.runPythonAsync(scripts.grammarParser);
+  await pyodide.runPythonAsync(scripts.completion);
 
   pyodide.globals.get('sys').stdout.write = patchedStdout;
 

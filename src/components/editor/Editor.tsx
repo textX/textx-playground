@@ -1,5 +1,5 @@
 import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js';
-import React, { createRef, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { createEditor } from '../../utils/editorUtils';
 
 export type EditorProps = {
@@ -21,27 +21,25 @@ const Editor: React.FC<EditorProps> = (
     className,
   }) => {
   const editorRef = useRef<editor.IStandaloneCodeEditor>();
-  const ref = createRef<HTMLDivElement>();
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const currentEditor = editorRef.current;
-
     if (ref.current) {
-      const start = async () => {
-        const monacoEditor = await createEditor({
-          languageId,
-          languageExtension,
-          fileName,
-          htmlElement: ref.current!,
-          content: defaultCode,
-        });
-        // @ts-ignore
-        onInitialized?.(monacoEditor);
-      };
-      start();
+      const monacoEditor = createEditor({
+        languageId,
+        languageExtension,
+        fileName,
+        htmlElement: ref.current,
+        content: defaultCode,
+      });
+      editorRef.current = monacoEditor;
+      onInitialized?.(monacoEditor);
 
       return () => {
-        currentEditor?.dispose();
+        const model = monacoEditor.getModel();
+        monacoEditor.dispose();
+        model?.dispose();
+        editorRef.current = undefined;
       };
     }
   }, []);
