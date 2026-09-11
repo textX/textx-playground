@@ -16,7 +16,7 @@ export default function Header() {
             </div>
             <nav className="flex flex-row items-center space-x-8">
                 <ExampleSelection />
-                <a href={'https://textx.github.io/textX/stable/'} target={'_blank'} className="font-semibold">Documentation</a>
+                <a href={'https://textx.github.io/textX/'} target={'_blank'} className="font-semibold">Documentation</a>
                 <ThemeToggler />
                 <a href={'https://github.com/textX/textX'} target={'_blank'}>
                     <img
