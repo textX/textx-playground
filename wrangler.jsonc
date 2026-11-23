@@ -1,0 +1,11 @@
+// Cloudflare Workers static assets config for https://play.textx.org
+// Build first with: VITE_BASE=/ npm run build
+{
+  "name": "textx-playground",
+  "compatibility_date": "2025-11-01",
+  "assets": {
+    "directory": "./dist",
+    // Unknown paths serve index.html (the app reads its state from the query string).
+    "not_found_handling": "single-page-application"
+  }
+}

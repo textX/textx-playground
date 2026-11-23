@@ -1,0 +1,10 @@
+# Cloudflare static assets headers (ignored by GitHub Pages).
+
+# Vite emits content-hashed files under assets/, safe to cache forever.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# TODO: remove at public launch. Keeps the site out of search engines
+# while it is behind Cloudflare Access for private review.
+/*
+  X-Robots-Tag: noindex
