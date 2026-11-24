@@ -57,3 +57,18 @@ Completion regression tests use the same textX and pygls versions as the worker:
 python -m pip install -r tests/requirements.txt
 python -m unittest discover -s tests -v
 ```
+
+## Deployment
+
+The app is deployed to two places from `main`:
+
+- **GitHub Pages** (`.github/workflows/deploy.yml`), served under `/textx-playground/`. This is the default `base`.
+- **Cloudflare** at https://play.textx.org (`.github/workflows/cloudflare.yml`), built with `VITE_BASE=/` and deployed with `wrangler deploy` (config in `wrangler.jsonc`). The workflow needs the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets; pull requests only build.
+
+To build for the Cloudflare base locally:
+
+```
+VITE_BASE=/ npm run build
+```
+
+`public/_headers` (used by Cloudflare only) sets long-lived caching for hashed assets and a temporary `X-Robots-Tag: noindex` that should be removed at public launch.

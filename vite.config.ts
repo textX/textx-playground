@@ -13,5 +13,7 @@ export default defineConfig({
   resolve: {
     dedupe: ['monaco-editor', 'vscode']
   },
-  base: '/textx-playground/'
+  // Base path the app is served from. Defaults to the GitHub Pages path;
+  // the Cloudflare deploy (play.textx.org) builds with VITE_BASE=/ .
+  base: process.env.VITE_BASE || '/textx-playground/'
 })
