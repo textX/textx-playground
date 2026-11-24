@@ -11,6 +11,19 @@
     <meta name="theme-color" content="#ffffff">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>textX Playground</title>
+    <script>
+      // Theme shared with textx.org through a cookie on Domain=textx.org (see src/utils/theme.ts).
+      // Runs before first paint: the explicit choice or the system setting. On *.textx.org only the
+      // shared cookie counts (no cookie = "Auto" picked on the site); elsewhere localStorage is used.
+      (function () {
+        var m = document.cookie.match(/(?:^|; )textx-theme=(light|dark)/);
+        var shared = /(^|\.)textx\.org$/.test(location.hostname);
+        var stored = null;
+        try { stored = shared ? null : localStorage.getItem('theme'); } catch (e) {}
+        var theme = (m && m[1]) || stored || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        if (theme === 'dark') document.documentElement.classList.add('dark');
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

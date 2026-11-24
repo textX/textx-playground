@@ -1,46 +1,38 @@
 import { MoonIcon, SunIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
 import { useEditorsContext } from '../../context/editorContext';
+import { Theme, currentTheme, saveTheme } from '../../utils/theme';
 
 export default function ThemeToggler() {
-  const [theme, setTheme] = useState<'light' | 'dark'>();
+  // index.html already applied the shared theme (cookie / localStorage / system) before render.
+  const [theme, setTheme] = useState<Theme>(currentTheme);
   const { modelEditor, grammarEditor, setEditorsTheme } = useEditorsContext();
 
   useEffect(() => {
     if (modelEditor && grammarEditor) {
-      setEditorsTheme(theme === 'dark' ? 'vs-dark' : 'vs');
+      setEditorsTheme(currentTheme() === 'dark' ? 'vs-dark' : 'vs');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setEditorsTheme is recreated every render
   }, [modelEditor, grammarEditor]);
 
-  useEffect(() => {
-    const currentTheme = localStorage.theme ?? 'light';
-    setTheme(currentTheme);
-    if (currentTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    }
-  }, []);
-
-  const toggleTheme = async () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
+  const toggleTheme = () => {
+    const newTheme: Theme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
-    const { documentElement } = document;
-    if (newTheme === 'dark') {
-      documentElement.classList.add('dark')
-    } else {
-      documentElement.classList.remove('dark')
-    }
-    localStorage.setItem('theme', newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    saveTheme(newTheme);
     setEditorsTheme(newTheme === 'dark' ? 'vs-dark' : 'vs');
   }
 
-  if (!theme) {
-    return null;
-  }
-
   return (
-    <div onClick={() => toggleTheme()} className="cursor-pointer hover:opacity-80">
-      <SunIcon className="w-6 h-6 text-yellow-500 inline dark:hidden" />
-      <MoonIcon className="w-6 h-6 text-blue-500 hidden dark:inline" />
-    </div>
+    <button
+      type="button"
+      onClick={() => toggleTheme()}
+      className="rounded-md p-1 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+      aria-label="Toggle dark mode"
+      title="Toggle dark mode"
+    >
+      <SunIcon className="w-5 h-5 inline dark:hidden" />
+      <MoonIcon className="w-5 h-5 hidden dark:inline" />
+    </button>
   );
 }
