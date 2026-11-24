@@ -38,4 +38,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # Without this the action installs its default Wrangler 3.x, which
+          # does not read wrangler.jsonc and fails with "Missing entry-point".
+          wranglerVersion: '4.167.0'
           command: deploy
